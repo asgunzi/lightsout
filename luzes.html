@@ -1,0 +1,199 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8"/>
+
+
+<title>Arte Matemática com JS D3</title>
+
+
+<script src="https://d3js.org/d3.v4.min.js"></script>
+<link rel="stylesheet" type="text/css"  href="../estilo_menu.css" />
+
+<style>  
+</style>
+
+</head>
+
+
+<body>
+
+<h1>Apagar as luzes</h1>
+
+<p>Amarelo: aceso; Azul: apagado</p>
+
+<button type = "button"  onclick="Desenhar()" tabindex = "0">Reiniciar</button>  
+
+
+<p id = "svg01"></p>
+
+
+<br>
+<hr>
+
+<script>
+    var svg = d3.select("#svg01")
+        .append("svg")
+        .attr("width", 1500)
+        .attr("height", 800);
+     
+	var bool1 = [[0,0,0,0,0],[0,0,0,0,0],
+	[0,0,0,0,0],[0,0,0,0,0],[0,0,0,0,0]];
+	
+	Desenhar();
+
+	function getRandomInt(min, max) {
+		min = Math.ceil(min);
+		max = Math.floor(max);
+		return Math.floor(Math.random() * (max - min + 1)) + min;
+	}
+
+
+	function Desenhar()
+	{
+	
+	svg.selectAll("*").remove();
+	var cor;
+	var lado = 100;
+	var i;
+	var j;
+	var testeSolvability =false;
+		
+	
+	while (!testeSolvability)
+	{
+	
+	for ( i=0; i<5; i++)
+		for ( j = 0; j<5; j++)
+			bool1[i][j] =getRandomInt(0,1);
+
+	testeSolvability = testeSol(bool1);
+	}
+	
+	for ( i=0; i<5; i++)
+		for ( j = 0; j<5; j++)
+		{
+			if (bool1[i][j])
+				cor = "goldenrod";	
+			else
+				cor = "#2A2194";
+				
+		   svg.append("rect")
+		  .attr("x", lado*i + 100)
+		  .attr("y",  lado*j+30)
+		  .attr("width", lado)
+		  .attr("height", lado)
+		  .attr("stroke", "black")
+		  .attr("stroke-width", "1.5")
+		  .attr("fill", "gray")
+		  .attr("id", "rec" + String(i) + String(j))
+		  .on("click", function()
+		  {
+				
+				var strid =d3.select(this).attr("id");
+				var p = parseInt(strid.substring(3,4));
+				var q = parseInt(strid.substring(4,5));
+				atualizar(p,q);
+		});
+		}
+		
+		ligar();
+		
+	}
+	
+	function testeSol(arrTeste)
+	{
+	
+	var n1 = [[0, 1, 1, 1, 0], [1, 0, 1, 0, 1], [1, 1, 0, 1, 1], [1, 0, 1, 0, 1], [0, 1, 1, 1, 0]];
+	
+	var n2 = [[1, 0, 1, 0, 1], [1, 0, 1, 0, 1], [0, 0, 0, 0, 0], [1, 0, 1, 0, 1], [1, 0, 1, 0, 1]];
+	//Testa n1
+	
+	var sumprod1 =0;
+	var sumprod2 =0;
+	var boolOK =false;
+	var i;
+	var j;
+	
+	for ( i=0; i<5; i++)
+		for ( j = 0; j<5; j++)
+		{
+		 sumprod1  += n1[i][j]*arrTeste[i][j];
+		 sumprod2  += n2[i][j]*arrTeste[i][j];	 
+		 }
+	
+	if (sumprod1 % 2 == 0 && sumprod2 % 2 == 0)
+		boolOK =true;
+	
+	return( boolOK);	
+	
+	
+	}
+
+	 function atualizar(p, q) {
+				
+				var minp;
+				var minq;
+				var maxp;
+				var maxq;
+				var k;
+				var m;
+				
+				
+				if (p>0)
+						trocar(p-1,q);	
+			
+				if (q>0)
+						trocar(p,q-1);
+
+				trocar(p,q);
+		
+				if (p<4)
+					trocar(p+1,q);
+				
+				if (q<4)
+					trocar(p,q+1);
+									
+				ligar();
+				}
+				
+				
+				function trocar(k,m)
+				{
+					if (bool1[k][m])
+						bool1[k][m] = false;
+					else
+						bool1[k][m]= true;	
+				}
+				
+				function ligar() {
+				var k;
+				var m;
+				var cor;
+				var strid2;
+				var count = 0;
+				
+				for (k = 0; k < 5; k++)
+					for (m = 0; m < 5; m++)
+					{
+					
+					if (bool1[k][m])
+						{cor = "goldenrod";					
+						}
+					else
+						{
+						cor = "#2A2194";
+						count +=1;
+						}
+
+					strid2= "rec" + String(k) + String(m);
+					
+					d3.select("#" + strid2).attr("fill" , cor);					
+					}
+					
+					if (count==25)
+						window.alert("Parabéns, você conseguiu!");
+				} </script>
+
+</body>
+</html>
